@@ -1,0 +1,185 @@
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+    z-index: 1000;
+    padding: 0 1rem; /* Adjust padding for better spacing */
+    background-color: #ffffff; /* Ensure navbar is distinct */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Navbar Brand */
+.navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between logo and text */
+    height: 75px;
+    color: purple;
+}
+
+/* Dropdown Styling */
+.dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-menu .dropdown-item i {
+    font-size: 20px;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f0f0f0; /* Slight highlight effect */
+}
+
+/* Dark Theme Toggle */
+.form-check-input {
+    margin-top: -2px; /* Align with text */
+}
+
+/* Hero Section */
+.hero-section {
+    height: 300px;
+    color: purple;
+    background-size: cover;
+    background-position: center;
+    padding: 100px 0;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    text-align: left;
+}
+
+/* Card Styles */
+.card {
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    max-height: 250px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-body h5 {
+    color: #6f42c1;
+}
+
+/* Section Spacing */
+section {
+    padding: 60px 0;
+}
+
+/* Footer */
+footer {
+    background-color: #f1f1f1;
+    padding: 40px 0;
+}
+
+footer .row h5 {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+footer a {
+    text-decoration: none;
+    color: #6c757d;
+    transition: color 0.2s ease-in-out;
+}
+
+footer a:hover {
+    color: #6f42c1;
+}
+
+/* Bottom Bar */
+#bottom {
+    background-color: #7a1b7e !important;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    position: relative;
+    width: 100%;
+}
+
+#bottom a {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+#bottom a:hover {
+    color: #f0f0f0;
+}
+
+/* Sidebar */
+.sidebar {
+    max-height: 80vh;
+    overflow-y: auto;
+    border-left: 3px solid var(--brand-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--brand-color);
+    border-radius: 5px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease-in-out;
+}
+
+.sidebar a:hover {
+    color: var(--brand-hover-color);
+}
+
+
+/* Responsive Design */
+@media screen and (max-width: 767px) {
+    .navbar .navbar-brand span {
+        font-size: 1rem;
+    }
+
+    .hero-section {
+        height: 300px;
+    }
+
+    .footer {
+        text-align: center;
+        
+    }
+}
+
+/* Utility Classes */
+.full-width {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+}

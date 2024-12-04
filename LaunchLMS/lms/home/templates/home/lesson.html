@@ -1,0 +1,168 @@
+{% extends 'home/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Lesson - {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar: Modules and Lessons -->
+        <div class="col-md-3">
+            <div style="background-color: #f8f9fa; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 0.5rem; border-left: 3px solid #00878D; position: sticky; top: 1rem; max-height: 80vh; overflow-y: auto;">
+                <h5 style="text-align: left; font-weight: 600; margin-bottom: 1.5rem; color: #333;">{{ lesson.module.course.title }}</h5>
+                <ul style="list-style: none; padding-left: 0;">
+                    {% for module in lesson.module.course.modules.all|dictsort:"created_at" %}
+                        <li style="margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                <i class="bi bi-folder2" style="color: #00878D; font-size: 1.25rem; margin-right: 0.75rem;"></i>
+                                <strong style="color: #333;">{{ module.title }}</strong>
+                            </div>
+                            <ul style="list-style: none; padding-left: 1rem;">
+                                {% for sibling_lesson in module.lessons.all|dictsort:"created_at" %}
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <a href="{% url 'lesson_detail' sibling_lesson.id %}" style="display: flex; justify-content: space-between; align-items: center; color: #333; text-decoration: none; {% if sibling_lesson.id == lesson.id %}font-weight: bold; color: #00878D;{% endif %}">
+                                            <span>{{ sibling_lesson.title }}</span>
+                                            {% if sibling_lesson.id in read_lesson_ids %}
+                                                <i class="bi bi-check-circle-fill" style="color: #28a745;"></i>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Lesson Content -->
+        <div class="col-md-9">
+            <div style="background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);">
+                <h3 style="color: #333; margin-bottom: 1.5rem;">{{ lesson.title }}</h3>
+                {% if lesson.image_content %}
+                    <img src="{{ lesson.image_content.url }}" style="width: 100%; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem;" alt="{{ lesson.title }}">
+                {% endif %}
+
+                {% if lesson.description %}
+                    <p style="color: #6c757d; margin-bottom: 1.5rem;">{{ lesson.description }}</p>
+                {% endif %}
+
+                {% if lesson.objectives %}
+                    <div style="margin-bottom: 2rem;">
+                        <h5 style="color: #333; margin-bottom: 1rem;">Learning Objectives</h5>
+                        <ul style="list-style: none; padding-left: 1rem;">
+                            {% for objective in lesson.objectives.splitlines %}
+                                <li style="margin-bottom: 0.5rem;">
+                                    <i class="bi bi-check-circle-fill" style="color: #28a745; margin-right: 0.5rem;"></i>{{ objective }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {% if lesson.content %}
+                    <div style="margin-bottom: 2rem;">
+                        <h5 style="color: #333; margin-bottom: 1rem;">Lesson Content</h5>
+                        <p>{{ lesson.content | safe }}</p>
+                    </div>
+                {% endif %}
+
+                {% if lesson.video_content %}
+                    <div style="margin-bottom: 2rem;">
+                        <h5 style="color: #333; margin-bottom: 1rem;">Watch the Lesson</h5>
+                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                            {% with lesson.video_content|extract_video_id as video_id %}
+                                <iframe src="https://www.youtube.com/embed/{{ video_id }}" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+                            {% endwith %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if lesson.additional_material %}
+                    <div style="margin-bottom: 2rem;">
+                        <h5 style="color: #333; margin-bottom: 1rem;">Additional Material</h5>
+                        <a href="{{ lesson.additional_material }}" target="_blank" style="display: inline-block; padding: 0.5rem 1.5rem; background-color: #00878D; color: white; text-decoration: none; border-radius: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">Open Resource</a>
+                    </div>
+                {% endif %}
+
+                <div style="margin-bottom: 2rem;">
+                    <div style="height: 1.5rem; background-color: #e9ecef; border-radius: 0.75rem; overflow: hidden;">
+                        <div style="width: {{ progress_percentage }}%; height: 100%; background-color: #00878D; text-align: center; color: white; font-weight: bold; line-height: 1.5rem;">{{ progress_percentage }}%</div>
+                    </div>
+                </div>
+
+        <!-- Test Your Knowledge Section (Only in Last Lesson of the Module) -->
+        {% if lesson == lesson.module.lessons.last and lesson.module.quizzes.exists %}
+            <div class="compartment mb-5">
+                <h5 class="text-dark mb-3">Test Your Knowledge</h5>
+
+                {% with quiz=lesson.module.quizzes.first %}
+                    {% if quiz %}
+                        {% if quiz_attempt %}
+                            <p>You have already attempted this quiz.</p>
+                            <p>Your score: {{ quiz_attempt.score }}%. {% if quiz_attempt.score >= 75 %}You can proceed to the next module.{% else %}You need to retake the quiz to proceed.{% endif %}</p>
+                            <a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-primary rounded-pill shadow-lg">
+                                Retake Quiz
+                            </a>
+                        {% else %}
+                            <p>You have reached the last lesson of this module. Take the quiz to test your knowledge!</p>
+                            <a href="{% url 'quiz_detail' quiz.id %}" class="btn btn-primary rounded-pill shadow-lg">
+                                Start Quiz
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <p>No quiz available for this module.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% endif %}
+
+
+
+                <!-- Navigation Buttons -->
+                <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+                    <div id="previous-button">
+                        {% if previous_lesson %}
+                            <a href="{% url 'lesson_detail' previous_lesson.id %}" style="text-decoration: none; padding: 0.5rem 1.5rem; border: 1px solid #6c757d; color: #6c757d; border-radius: 2rem;">
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </a>
+                        {% else %}
+                            <button style="padding: 0.5rem 1.5rem; border: 1px solid #6c757d; color: #6c757d; border-radius: 2rem;" disabled>
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div id="action-buttons">
+                        <form method="POST" id="next-lesson-form" style="display: flex; gap: 1rem;">
+                            {% csrf_token %}
+                            {% if read %}
+                                <button type="submit" name="unmark_read" style="padding: 0.5rem 1.5rem; border: 1px solid #dc3545; color: #dc3545; border-radius: 2rem;">
+                                    <i class="bi bi-bookmark-check"></i> Unmark as Read
+                                </button>
+                            {% else %}
+                                <button type="submit" name="mark_read" style="padding: 0.5rem 1.5rem; border: 1px solid #28a745; color: #28a745; border-radius: 2rem;">
+                                    <i class="bi bi-bookmark-plus"></i> Mark as Read
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <div id="next-button">
+                        {% if next_lesson %}
+                            <a href="{% url 'lesson_detail' next_lesson.id %}" style="text-decoration: none; padding: 0.5rem 1.5rem; border: 1px solid #6c757d; color: #6c757d; border-radius: 2rem;">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <button style="padding: 0.5rem 1.5rem; border: 1px solid #6c757d; color: #6c757d; border-radius: 2rem;" disabled>
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
